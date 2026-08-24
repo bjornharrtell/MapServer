@@ -1,11 +1,11 @@
 name: Code Checks
 
-# Legacy C/C++ CI is skipped on the rust-port branch, which only touches rust/.
+# Legacy C/C++ CI is skipped for changes that only touch rust/.
 on:
   push:
-    branches-ignore: [rust-port]
+    paths-ignore: ['rust/**']
   pull_request:
-    branches-ignore: [rust-port]
+    paths-ignore: ['rust/**']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
