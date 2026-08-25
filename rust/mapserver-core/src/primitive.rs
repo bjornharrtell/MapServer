@@ -99,7 +99,10 @@ pub fn rect_overlap(a: &Rect, b: &Rect) -> bool {
 /// Computes the intersection of two rectangles, updating `a` to be only the
 /// intersection of the two. Returns `false` if the intersection is empty.
 ///
-/// Direct port of `msRectIntersect()` from `src/mapsearch.c`.
+/// Direct port of `msRectIntersect()` from `src/mapsearch.c`. Note the
+/// emptiness check only inspects the x-axis (`maxx < minx`) of `a` and `b`,
+/// not the y-axis; this mirrors the original C implementation exactly
+/// (intentionally, for behavior parity) even though it looks asymmetric.
 pub fn rect_intersect(a: &mut Rect, b: &Rect) -> bool {
     if a.maxx > b.maxx {
         a.maxx = b.maxx;
@@ -279,6 +282,9 @@ pub fn square_distance_point_to_segment(p: &Point, a: &Point, b: &Point) -> f64 
         return square_distance_point_to_point(a, p);
     }
 
+    // Equivalent to the standard projection parameter
+    // `dot(p - a, b - a) / l_squared`, just written (as in the C original)
+    // with each term's subtraction order flipped in a way that cancels out.
     let r = ((a.y - p.y) * (a.y - b.y) - (a.x - p.x) * (b.x - a.x)) / l_squared;
 
     if !(0.0..=1.0).contains(&r) {
