@@ -10,4 +10,5 @@ pub mod bits;
 pub mod color;
 pub mod debug;
 pub mod error;
+pub mod primitive;
 pub mod string;
