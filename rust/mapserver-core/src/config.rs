@@ -6,17 +6,37 @@
 use std::collections::BTreeMap;
 
 /// A primitive mapfile value.
+///
+/// The `CaseInsensitiveString`, `Regex`, `List`, and `Expression` variants
+/// mirror the extra token types produced by MapServer's lexer
+/// (`src/maplexer.l`) for `expressionObj` values: `'text'i`/`"text"i` (case
+/// insensitive string, `MS_ISTRING`), `/regex/` and `/regex/i`
+/// (`MS_REGEX`/`MS_IREGEX`), `{a,b,c}` (`MS_LIST`), and `(...)` (a full
+/// logical expression, `MS_EXPRESSION`).
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConfigValue {
     String(String),
     Number(f64),
     Bool(bool),
+    /// A quoted string suffixed with `i`, e.g. `"text"i` (`MS_ISTRING`).
+    CaseInsensitiveString(String),
+    /// A `/pattern/` or `/pattern/i` regular expression token.
+    Regex {
+        pattern: String,
+        case_insensitive: bool,
+    },
+    /// A `{a,b,c}` token (`MS_LIST`), split into its raw comma-separated
+    /// values.
+    List(Vec<String>),
+    /// A `(...)` logical expression token (`MS_EXPRESSION`), holding the raw
+    /// source between the outer parentheses (unparsed).
+    Expression(String),
 }
 
 impl ConfigValue {
     pub fn as_str(&self) -> Option<&str> {
         match self {
-            Self::String(value) => Some(value),
+            Self::String(value) | Self::CaseInsensitiveString(value) => Some(value),
             _ => None,
         }
     }

@@ -7,6 +7,7 @@
 //! is gradually re-implemented in Rust.
 
 pub mod bits;
+pub mod class;
 pub mod color;
 pub mod config;
 pub mod datasource;

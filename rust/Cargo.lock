@@ -688,6 +688,7 @@ name = "mapserver-core"
 version = "0.1.0"
 dependencies = [
  "proj",
+ "regex",
 ]
 
 [[package]]
