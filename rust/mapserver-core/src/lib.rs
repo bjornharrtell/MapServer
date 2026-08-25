@@ -16,4 +16,5 @@ pub mod error;
 pub mod mapfile;
 pub mod primitive;
 pub mod projection;
+pub mod query;
 pub mod string;
