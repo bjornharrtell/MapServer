@@ -101,13 +101,14 @@ impl Reprojector {
         let src = definition_or_default_wgs84(input);
         let dst = definition_or_default_wgs84(output);
 
-        let transformer = Proj::new_known_crs(src.as_str(), dst.as_str(), None).ok_or_else(|| {
-            MapServerError::new(
-                11,
-                "msProjectCreateReprojector",
-                format!("failed to create PROJ transform from '{src}' to '{dst}'"),
-            )
-        })?;
+        let transformer =
+            Proj::new_known_crs(src.as_str(), dst.as_str(), None).ok_or_else(|| {
+                MapServerError::new(
+                    11,
+                    "msProjectCreateReprojector",
+                    format!("failed to create PROJ transform from '{src}' to '{dst}'"),
+                )
+            })?;
 
         Ok(Self {
             transformer: Some(transformer),
