@@ -66,15 +66,23 @@ pub fn should_log(level: i32) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::{Mutex, OnceLock};
+
+    fn test_lock() -> &'static Mutex<()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+    }
 
     #[test]
     fn global_level_round_trips() {
+        let _guard = test_lock().lock().expect("test lock poisoned");
         set_global_debug_level(5);
         assert_eq!(global_debug_level(), 5);
     }
 
     #[test]
     fn should_log_respects_global_level() {
+        let _guard = test_lock().lock().expect("test lock poisoned");
         set_global_debug_level(20);
         assert!(should_log(1));
         assert!(!should_log(21));
@@ -82,6 +90,7 @@ mod tests {
 
     #[test]
     fn error_file_round_trips() {
+        let _guard = test_lock().lock().expect("test lock poisoned");
         set_error_file(Some("stderr"));
         assert_eq!(error_file(), Some("stderr".to_string()));
 

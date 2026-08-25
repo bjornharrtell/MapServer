@@ -59,7 +59,7 @@ pub fn string_split_complex(input: &str, delimiters: &str, flags: u32) -> Vec<St
     let mut out = Vec::new();
 
     while i < bytes.len() {
-        let mut token = String::new();
+        let mut token = Vec::<u8>::new();
         let mut in_string = false;
         let mut start_string = true;
 
@@ -72,7 +72,7 @@ pub fn string_split_complex(input: &str, delimiters: &str, flags: u32) -> Vec<St
 
             if (flags & HONOUR_STRINGS) != 0 && b == b'"' {
                 if (flags & PRESERVE_QUOTES) != 0 {
-                    token.push('"');
+                    token.push(b'"');
                 }
                 in_string = !in_string;
                 i += 1;
@@ -85,7 +85,7 @@ pub fn string_split_complex(input: &str, delimiters: &str, flags: u32) -> Vec<St
                 && (bytes[i + 1] == b'"' || bytes[i + 1] == b'\\')
             {
                 if (flags & PRESERVE_ESCAPES) != 0 {
-                    token.push('\\');
+                    token.push(b'\\');
                 }
                 i += 1;
             }
@@ -100,18 +100,21 @@ pub fn string_split_complex(input: &str, delimiters: &str, flags: u32) -> Vec<St
             }
 
             start_string = false;
-            token.push(bytes[i] as char);
+            token.push(bytes[i]);
             i += 1;
         }
 
         if !in_string && (flags & STRIP_END_SPACES) != 0 {
-            while token.ends_with(|c: char| c.is_ascii_whitespace()) {
+            while token
+                .last()
+                .is_some_and(|c| (*c as char).is_ascii_whitespace())
+            {
                 token.pop();
             }
         }
 
         if !token.is_empty() || (flags & ALLOW_EMPTY_TOKENS) != 0 {
-            out.push(token);
+            out.push(String::from_utf8(token).expect("token stays valid UTF-8"));
         }
     }
 
@@ -130,23 +133,23 @@ pub fn string_tokenize(input: &str, delimiter: &str, preserve_quote: bool) -> Ve
     let bytes = input.as_bytes();
     let delim = delimiter.as_bytes();
     let mut out = Vec::new();
-    let mut token = String::new();
+    let mut token = Vec::<u8>::new();
     let mut i = 0usize;
     let mut in_quotes = false;
 
     while i < bytes.len() {
         if in_quotes && i + 1 < bytes.len() && bytes[i] == b'"' && bytes[i + 1] == b'"' {
             if preserve_quote {
-                token.push('"');
+                token.push(b'"');
             }
-            token.push('"');
+            token.push(b'"');
             i += 2;
             continue;
         }
 
         if bytes[i] == b'"' {
             if preserve_quote {
-                token.push('"');
+                token.push(b'"');
             }
             in_quotes = !in_quotes;
             i += 1;
@@ -154,16 +157,18 @@ pub fn string_tokenize(input: &str, delimiter: &str, preserve_quote: bool) -> Ve
         }
 
         if !in_quotes && i + delim.len() <= bytes.len() && &bytes[i..i + delim.len()] == delim {
-            out.push(std::mem::take(&mut token));
+            out.push(
+                String::from_utf8(std::mem::take(&mut token)).expect("token stays valid UTF-8"),
+            );
             i += delim.len();
             continue;
         }
 
-        token.push(bytes[i] as char);
+        token.push(bytes[i]);
         i += 1;
     }
 
-    out.push(token);
+    out.push(String::from_utf8(token).expect("token stays valid UTF-8"));
     out
 }
 
@@ -300,12 +305,20 @@ mod tests {
             vec!["a", "b,c", "d"]
         );
         assert_eq!(
+            string_split_complex("å,\"é,ö\",ç", ",", HONOUR_STRINGS),
+            vec!["å", "é,ö", "ç"]
+        );
+        assert_eq!(
             string_split_complex(",a,,", ",", ALLOW_EMPTY_TOKENS),
             vec!["", "a", "", ""]
         );
         assert_eq!(
             string_tokenize("a||\"b||c\"||d", "||", false),
             vec!["a", "b||c", "d"]
+        );
+        assert_eq!(
+            string_tokenize("å||\"é||ö\"||ç", "||", false),
+            vec!["å", "é||ö", "ç"]
         );
     }
 
