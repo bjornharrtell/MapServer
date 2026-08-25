@@ -35,7 +35,8 @@ being done incrementally:
   parsing, bit-array helpers, string/scalar helpers, error model, debug
   scaffolding, and core geometry primitives: rect/point/line/shape, rect
   relations, point-in-polygon, segment intersection, distance, bounds
-  computation, and rect clipping).
+   computation, and rect clipping), plus initial mapfile configuration object
+   model and parser for nested `MAP/LAYER/CLASS/STYLE ... END` blocks.
 
 ## Building and testing
 
