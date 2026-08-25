@@ -42,7 +42,10 @@ being done incrementally:
    trait with an in-memory backend for feature querying, and a
    symbology/style/class/label object model with `expressionObj`-equivalent
    parsing (string/list/regex/logical expressions) and class-matching logic
-   mirroring `msShapeGetNextClass()`).
+   mirroring `msShapeGetNextClass()`, and a query engine
+   (`query_by_rect`/`query_by_point`/`query_by_attributes`/`query_by_shape`)
+   mirroring the per-feature matching core of `msQueryBy*()`
+   (`src/mapquery.cpp`)).
 - `mapserver-flatgeobuf` - a `LayerDataSource` implementation backed by the
    `flatgeobuf` crate, for `.fgb` layers.
 
