@@ -32,11 +32,13 @@ being done incrementally:
 ## Layout
 
 - `mapserver-core` - core utilities being ported first (currently: color
-  parsing, bit-array helpers, string/scalar helpers, error model, debug
-  scaffolding, and core geometry primitives: rect/point/line/shape, rect
-  relations, point-in-polygon, segment intersection, distance, bounds
-   computation, and rect clipping), plus initial mapfile configuration object
-   model and parser for nested `MAP/LAYER/CLASS/STYLE ... END` blocks.
+   parsing, bit-array helpers, string/scalar helpers, error model, debug
+   scaffolding, core geometry primitives: rect/point/line/shape, rect
+   relations, point-in-polygon, segment intersection, distance, bounds
+   computation, rect clipping, and initial PROJ-backed projection support
+   for loading CRS strings and transforming point/shape/rect geometries,
+   plus initial mapfile configuration object model and parser for nested
+   `MAP/LAYER/CLASS/STYLE ... END` blocks).
 
 ## Building and testing
 
