@@ -32,8 +32,10 @@ being done incrementally:
 ## Layout
 
 - `mapserver-core` - core utilities being ported first (currently: color
-  parsing, bit-array helpers, string/scalar helpers, error model, and debug
-  scaffolding).
+  parsing, bit-array helpers, string/scalar helpers, error model, debug
+  scaffolding, and core geometry primitives: rect/point/line/shape, rect
+  relations, point-in-polygon, segment intersection, distance, bounds
+  computation, and rect clipping).
 
 ## Building and testing
 
