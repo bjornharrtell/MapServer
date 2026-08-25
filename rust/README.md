@@ -38,8 +38,13 @@ being done incrementally:
    computation, rect clipping, and initial PROJ-backed projection support
    for loading CRS strings and transforming point/shape/rect geometries,
    plus initial mapfile configuration object model and parser for nested
-   `MAP/LAYER/CLASS/STYLE ... END` blocks, and an initial layer data-source
-   abstraction trait with an in-memory backend for feature querying).
+   `MAP/LAYER/CLASS/STYLE ... END` blocks, a layer data-source abstraction
+   trait with an in-memory backend for feature querying, and a
+   symbology/style/class/label object model with `expressionObj`-equivalent
+   parsing (string/list/regex/logical expressions) and class-matching logic
+   mirroring `msShapeGetNextClass()`).
+- `mapserver-flatgeobuf` - a `LayerDataSource` implementation backed by the
+   `flatgeobuf` crate, for `.fgb` layers.
 
 ## Building and testing
 

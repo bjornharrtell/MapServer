@@ -7,3 +7,4 @@ license = "MIT"
 
 [dependencies]
 proj = { version = "0.27", features = ["bundled_proj"] }
+regex = "1"
