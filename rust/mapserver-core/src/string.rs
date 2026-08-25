@@ -173,11 +173,11 @@ pub fn string_tokenize(input: &str, delimiter: &str, preserve_quote: bool) -> Ve
 }
 
 pub fn needs_url_encoding(c: u8) -> bool {
-    !((c >= 0x61 && c <= 0x7A)
-        || (c >= 0x41 && c <= 0x5A)
-        || (c >= 0x30 && c <= 0x39)
-        || (c >= 0x27 && c <= 0x2A)
-        || (c >= 0x2D && c <= 0x2E)
+    !((0x61..=0x7A).contains(&c)
+        || (0x41..=0x5A).contains(&c)
+        || (0x30..=0x39).contains(&c)
+        || (0x27..=0x2A).contains(&c)
+        || (0x2D..=0x2E).contains(&c)
         || c == 0x5F
         || c == 0x21
         || c == 0x7E)
@@ -301,7 +301,7 @@ mod tests {
         assert_eq!(string_to_int("  -10", 10), Some(-10));
         assert_eq!(string_to_int("A", 16), Some(10));
         assert_eq!(string_to_int("10x", 10), None);
-        assert_eq!(string_to_double("  3.14"), Some(3.14));
+        assert_eq!(string_to_double("  3.15"), Some(3.15));
         assert_eq!(string_to_double("3.14x"), None);
     }
 

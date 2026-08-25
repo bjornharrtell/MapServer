@@ -2,19 +2,10 @@
 
 use std::sync::{Mutex, OnceLock};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 struct DebugState {
     global_debug_level: i32,
     error_file: Option<String>,
-}
-
-impl Default for DebugState {
-    fn default() -> Self {
-        Self {
-            global_debug_level: 0,
-            error_file: None,
-        }
-    }
 }
 
 fn state() -> &'static Mutex<DebugState> {

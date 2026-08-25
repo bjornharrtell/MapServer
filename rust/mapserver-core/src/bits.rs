@@ -3,7 +3,7 @@
 const MS_ARRAY_BIT: usize = u32::BITS as usize;
 
 pub fn get_bit_array_size(numbits: usize) -> usize {
-    (numbits + MS_ARRAY_BIT - 1) / MS_ARRAY_BIT
+    numbits.div_ceil(MS_ARRAY_BIT)
 }
 
 pub fn alloc_bit_array(numbits: usize) -> Vec<u32> {
