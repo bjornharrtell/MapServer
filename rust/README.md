@@ -51,6 +51,12 @@ being done incrementally:
 - `mapserver-parity-tests` - parity checks between the Rust port and the
    original C implementation, see "Parity testing against the C
    implementation" below.
+- `mapserver-render` - a rendering pipeline abstraction (`Renderer` trait)
+   with a Skia-backed implementation (`SkiaRenderer`), plus a
+   `render_layer` function that classifies features (via
+   `mapserver-core`'s `class` module) and draws points/lines/polygons
+   styled by the matched class, mirroring the per-shape draw loop in
+   `msDrawLayer()`/`msDrawShape()` (`src/mapdraw.c`) — see "Rendering" below.
 
 ## Building and testing
 
@@ -94,4 +100,38 @@ Run just the parity suite with:
 ```sh
 cd rust
 cargo test -p mapserver-parity-tests
+```
+
+## Rendering
+
+`mapserver-render` replaces the legacy AGG-based rendering engine
+(`mapagg.cpp`) with a small `Renderer` trait (`draw_point`/`draw_line`/
+`draw_polygon`, styled by `mapserver-core`'s `StyleObj`) and a Skia-backed
+implementation (`SkiaRenderer`) built on
+[`skia-safe`](https://crates.io/crates/skia-safe), taking inspiration from
+the abandoned Skia effort in
+[MapServer/MapServer#6574](https://github.com/MapServer/MapServer/pull/6574).
+
+`view::MapView` converts georeferenced coordinates to pixel coordinates
+given an extent and image size (mirroring `MS_MAP2IMAGE_X`/`_Y` in
+`src/mapserver.h`), and `layer::render_layer` ties this together with
+`mapserver-core::class::get_class` to classify and draw a slice of
+`Feature`s (as produced by a `LayerDataSource` query) onto a `Renderer`.
+
+This first cut intentionally covers only the core per-feature drawing path:
+`SYMBOL`/`PATTERN` styling, multiple layered styles per class (e.g. cased
+lines), and label rendering are left as follow-up work, to be driven by
+concrete needs once the OWS service layer (issue tracked by the epic) is
+built on top of this.
+
+Render a PNG and inspect it, e.g. in a test:
+
+```rust
+use mapserver_core::primitive::Rect;
+use mapserver_render::{render_layer, MapView, SkiaRenderer};
+
+let view = MapView::new(Rect { minx: 0.0, miny: 0.0, maxx: 100.0, maxy: 100.0 }, 256, 256);
+let mut renderer = SkiaRenderer::new(256, 256, None);
+render_layer(&features, &classes, None, None, &view, &mut renderer);
+let png_bytes = renderer.encode_png();
 ```

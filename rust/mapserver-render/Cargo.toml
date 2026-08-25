@@ -1,0 +1,13 @@
+[package]
+name = "mapserver-render"
+version = "0.1.0"
+edition = "2021"
+description = "Rendering pipeline abstraction and Skia backend for the MapServer Rust port (replaces the legacy AGG renderer)."
+license = "MIT"
+publish = false
+
+[dependencies]
+mapserver-core = { path = "../mapserver-core" }
+skia-safe = "0.75"
+
+[dev-dependencies]
