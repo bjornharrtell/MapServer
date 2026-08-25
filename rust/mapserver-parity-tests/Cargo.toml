@@ -1,0 +1,13 @@
+[package]
+name = "mapserver-parity-tests"
+version = "0.1.0"
+edition = "2021"
+description = "Parity checks comparing ported Rust modules against verbatim-extracted reference copies of the original C functions."
+license = "MIT"
+publish = false
+
+[dependencies]
+mapserver-core = { path = "../mapserver-core" }
+
+[build-dependencies]
+cc = "1"
