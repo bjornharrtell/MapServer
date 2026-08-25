@@ -8,3 +8,4 @@ tags
 tests/map.png
 .vagrant
 .idea
+rust/target

@@ -1,0 +1,6 @@
+[package]
+name = "mapserver-core"
+version = "0.1.0"
+edition = "2021"
+description = "Rust port of MapServer core utilities (work in progress)"
+license = "MIT"
