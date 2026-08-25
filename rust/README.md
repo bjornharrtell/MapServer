@@ -38,7 +38,8 @@ being done incrementally:
    computation, rect clipping, and initial PROJ-backed projection support
    for loading CRS strings and transforming point/shape/rect geometries,
    plus initial mapfile configuration object model and parser for nested
-   `MAP/LAYER/CLASS/STYLE ... END` blocks).
+   `MAP/LAYER/CLASS/STYLE ... END` blocks, and an initial layer data-source
+   abstraction trait with an in-memory backend for feature querying).
 
 ## Building and testing
 
