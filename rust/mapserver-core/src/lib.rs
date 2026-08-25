@@ -9,8 +9,8 @@
 pub mod bits;
 pub mod color;
 pub mod config;
-pub mod debug;
 pub mod datasource;
+pub mod debug;
 pub mod error;
 pub mod mapfile;
 pub mod primitive;
