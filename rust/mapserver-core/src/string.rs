@@ -172,7 +172,7 @@ pub fn string_tokenize(input: &str, delimiter: &str, preserve_quote: bool) -> Ve
     out
 }
 
-pub fn encode_char(c: u8) -> bool {
+pub fn needs_url_encoding(c: u8) -> bool {
     !((c >= 0x61 && c <= 0x7A)
         || (c >= 0x41 && c <= 0x5A)
         || (c >= 0x30 && c <= 0x39)
@@ -181,6 +181,10 @@ pub fn encode_char(c: u8) -> bool {
         || c == 0x5F
         || c == 0x21
         || c == 0x7E)
+}
+
+pub fn encode_char(c: u8) -> bool {
+    needs_url_encoding(c)
 }
 
 pub fn encode_url(data: &str) -> String {
@@ -194,7 +198,7 @@ pub fn encode_url_except(data: &str, except: Option<u8>) -> String {
     for &b in data.as_bytes() {
         if except == Some(b) {
             out.push(b as char);
-        } else if encode_char(b) {
+        } else if needs_url_encoding(b) {
             out.push('%');
             out.push(HEX[(b / 16) as usize] as char);
             out.push(HEX[(b % 16) as usize] as char);
