@@ -7,13 +7,3 @@
 //! is gradually re-implemented in Rust.
 
 pub mod color;
-
-#[cfg(test)]
-mod ci_probe {
-    use crate::color::hex_to_int;
-
-    #[test]
-    fn rust_only_change_probe() {
-        assert_eq!(hex_to_int(b"0F"), 15);
-    }
-}
