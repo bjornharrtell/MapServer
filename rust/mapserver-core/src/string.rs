@@ -183,6 +183,8 @@ pub fn needs_url_encoding(c: u8) -> bool {
         || c == 0x7E)
 }
 
+/// Direct port naming of `msEncodeChar()`: returns `true` when `c` should be
+/// percent-encoded, and `false` when it can be emitted as-is.
 pub fn encode_char(c: u8) -> bool {
     needs_url_encoding(c)
 }
@@ -253,6 +255,8 @@ pub fn encode_html_entities(input: &str) -> String {
     out
 }
 
+/// Mirrors `msStringIsInteger()`, which accepts only non-empty digit-only
+/// strings (`0-9`) and rejects signs/whitespace.
 pub fn string_is_integer(input: &str) -> bool {
     !input.is_empty() && input.chars().all(|c| c.is_ascii_digit())
 }
