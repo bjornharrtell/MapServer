@@ -720,7 +720,7 @@ pub enum Status {
 
 /// Rust equivalent of the subset of `styleObj` (`src/mapserver.h`) covering
 /// symbology (not rendering).
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct StyleObj {
     pub symbol_name: Option<String>,
     pub color: Option<Color>,
@@ -732,6 +732,26 @@ pub struct StyleObj {
     pub width: f64,
     pub outline_width: f64,
     pub angle: f64,
+}
+
+impl Default for StyleObj {
+    /// Matches `initStyle()` (`src/mapfile.c`), which sets `opacity = 100`
+    /// ("fully opaque") rather than leaving it at the numeric zero value
+    /// `#[derive(Default)]` would otherwise produce.
+    fn default() -> Self {
+        Self {
+            symbol_name: None,
+            color: None,
+            outline_color: None,
+            opacity: 100,
+            size: 0.0,
+            min_size: 0.0,
+            max_size: 0.0,
+            width: 0.0,
+            outline_width: 0.0,
+            angle: 0.0,
+        }
+    }
 }
 
 /// Rust equivalent of the subset of `labelObj` (`src/mapserver.h`) covering

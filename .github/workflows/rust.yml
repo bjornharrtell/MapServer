@@ -30,6 +30,11 @@ jobs:
         with:
           workspaces: rust
 
+      - name: Install system libraries (skia-safe runtime link deps)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+
       - name: Format check
         run: cargo fmt --all -- --check
 
