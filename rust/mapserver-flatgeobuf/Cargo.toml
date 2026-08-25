@@ -1,0 +1,14 @@
+[package]
+name = "mapserver-flatgeobuf"
+version = "0.1.0"
+edition = "2021"
+description = "FlatGeobuf layer backend for MapServer (Rust port)"
+license = "MIT"
+
+[dependencies]
+flatgeobuf = "4"
+geozero = { version = "0.14", default-features = false }
+log = "0.4"
+mapserver-core = { path = "../mapserver-core" }
+
+[dev-dependencies]
