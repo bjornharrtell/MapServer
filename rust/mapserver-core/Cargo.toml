@@ -4,3 +4,6 @@ version = "0.1.0"
 edition = "2021"
 description = "Rust port of MapServer core utilities (work in progress)"
 license = "MIT"
+
+[dependencies]
+proj = { version = "0.27", features = ["bundled_proj"] }
