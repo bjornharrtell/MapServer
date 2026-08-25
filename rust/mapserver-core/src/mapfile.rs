@@ -34,6 +34,7 @@ const BLOCK_KEYWORDS: &[&str] = &[
 
 pub fn parse_mapfile(input: &str) -> Result<ConfigBlock> {
     let mut stack: Vec<ConfigBlock> = Vec::new();
+    let mut root_closed = false;
 
     for (line_no, raw_line) in input.lines().enumerate() {
         let tokens = tokenize_line(raw_line)?;
@@ -41,15 +42,28 @@ pub fn parse_mapfile(input: &str) -> Result<ConfigBlock> {
             continue;
         }
 
+        if root_closed {
+            return Err(MapServerError::new(
+                12,
+                "parse_mapfile",
+                format!("unexpected tokens after MAP END at line {}", line_no + 1),
+            ));
+        }
+
         let keyword_upper = tokens[0].to_ascii_uppercase();
 
         if keyword_upper == "END" {
-            if stack.len() < 2 {
+            if stack.is_empty() {
                 return Err(MapServerError::new(
                     12,
                     "parse_mapfile",
                     format!("unexpected END at line {}", line_no + 1),
                 ));
+            }
+
+            if stack.len() == 1 {
+                root_closed = true;
+                continue;
             }
 
             let child = stack.pop().expect("checked stack length");
@@ -93,6 +107,14 @@ pub fn parse_mapfile(input: &str) -> Result<ConfigBlock> {
     let root = stack.pop().ok_or_else(|| {
         MapServerError::new(12, "parse_mapfile", "mapfile did not define any block")
     })?;
+
+    if !root_closed {
+        return Err(MapServerError::new(
+            12,
+            "parse_mapfile",
+            "mapfile is missing END for MAP block",
+        ));
+    }
 
     if root.kind != "MAP" {
         return Err(MapServerError::new(
@@ -266,6 +288,17 @@ LAYER
 END
 "#;
         let error = parse_mapfile(input).expect_err("root must be MAP");
+        assert_eq!(error.routine, "parse_mapfile");
+    }
+
+    #[test]
+    fn rejects_tokens_after_root_end() {
+        let input = r#"
+MAP
+END
+NAME late
+"#;
+        let error = parse_mapfile(input).expect_err("tokens after MAP END should fail");
         assert_eq!(error.routine, "parse_mapfile");
     }
 }
