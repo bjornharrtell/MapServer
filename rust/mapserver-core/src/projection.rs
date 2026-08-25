@@ -101,14 +101,13 @@ impl Reprojector {
         let src = definition_or_default_wgs84(input);
         let dst = definition_or_default_wgs84(output);
 
-        let transformer =
-            Proj::new_known_crs(src.as_str(), dst.as_str(), None).ok_or_else(|| {
-                MapServerError::new(
-                    11,
-                    "msProjectCreateReprojector",
-                    format!("failed to create PROJ transform from '{src}' to '{dst}'"),
-                )
-            })?;
+        let transformer = Proj::new_known_crs(src.as_str(), dst.as_str(), None).map_err(|e| {
+            MapServerError::new(
+                11,
+                "msProjectCreateReprojector",
+                format!("failed to create PROJ transform from '{src}' to '{dst}': {e}"),
+            )
+        })?;
 
         Ok(Self {
             transformer: Some(transformer),
@@ -123,13 +122,13 @@ impl Reprojector {
             return Ok(());
         };
 
-        let Some((x, y)) = transformer.convert((point.x, point.y)) else {
-            return Err(MapServerError::new(
+        let (x, y) = transformer.convert((point.x, point.y)).map_err(|e| {
+            MapServerError::new(
                 11,
                 "msProjectPointEx",
-                "PROJ transformation failed for point",
-            ));
-        };
+                format!("PROJ transformation failed for point: {e}"),
+            )
+        })?;
 
         point.x = x;
         point.y = y;
