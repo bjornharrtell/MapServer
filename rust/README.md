@@ -32,7 +32,8 @@ being done incrementally:
 ## Layout
 
 - `mapserver-core` - core utilities being ported first (currently: color
-  parsing, ported from `msHexToInt()`/`msSLDSetColorObject()`).
+  parsing, bit-array helpers, string/scalar helpers, error model, and debug
+  scaffolding).
 
 ## Building and testing
 
