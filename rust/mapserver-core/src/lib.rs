@@ -6,4 +6,8 @@
 //! verifiable against the original implementation while new functionality
 //! is gradually re-implemented in Rust.
 
+pub mod bits;
 pub mod color;
+pub mod debug;
+pub mod error;
+pub mod string;
