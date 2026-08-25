@@ -36,7 +36,9 @@ being done incrementally:
    scaffolding, core geometry primitives: rect/point/line/shape, rect
    relations, point-in-polygon, segment intersection, distance, bounds
    computation, rect clipping, and initial PROJ-backed projection support
-   for loading CRS strings and transforming point/shape/rect geometries).
+   for loading CRS strings and transforming point/shape/rect geometries,
+   plus initial mapfile configuration object model and parser for nested
+   `MAP/LAYER/CLASS/STYLE ... END` blocks).
 
 ## Building and testing
 
