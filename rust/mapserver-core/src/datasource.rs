@@ -68,10 +68,10 @@ impl LayerDataSource for MemoryDataSource {
         let mut out = Vec::new();
 
         for feature in &self.features {
-            if let Some(bbox) = options.bbox
-                && !rect_overlap(&feature.geometry.bounds, &bbox)
-            {
-                continue;
+            if let Some(bbox) = options.bbox {
+                if !rect_overlap(&feature.geometry.bounds, &bbox) {
+                    continue;
+                }
             }
 
             if !options.equals_filters.iter().all(|(name, expected)| {
@@ -83,10 +83,10 @@ impl LayerDataSource for MemoryDataSource {
             }
 
             out.push(feature.clone());
-            if let Some(limit) = options.limit
-                && out.len() >= limit
-            {
-                break;
+            if let Some(limit) = options.limit {
+                if out.len() >= limit {
+                    break;
+                }
             }
         }
 
