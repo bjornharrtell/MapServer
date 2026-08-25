@@ -7,3 +7,11 @@
 //! is gradually re-implemented in Rust.
 
 pub mod color;
+
+#[cfg(test)]
+mod ci_probe {
+    #[test]
+    fn rust_only_change_probe() {
+        assert!(true);
+    }
+}
