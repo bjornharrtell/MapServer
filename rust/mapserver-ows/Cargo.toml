@@ -1,0 +1,22 @@
+[package]
+name = "mapserver-ows"
+version = "0.1.0"
+edition = "2021"
+description = "Self-hosted HTTP OWS (WMS/WFS) service for the MapServer Rust port, replacing the legacy CGI/FastCGI entry point."
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "mapserver-ows"
+path = "src/main.rs"
+
+[dependencies]
+mapserver-core = { path = "../mapserver-core" }
+mapserver-render = { path = "../mapserver-render" }
+mapserver-flatgeobuf = { path = "../mapserver-flatgeobuf" }
+actix-web = "4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+actix-rt = "2"

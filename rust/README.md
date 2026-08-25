@@ -57,6 +57,9 @@ being done incrementally:
    `mapserver-core`'s `class` module) and draws points/lines/polygons
    styled by the matched class, mirroring the per-shape draw loop in
    `msDrawLayer()`/`msDrawShape()` (`src/mapdraw.c`) — see "Rendering" below.
+- `mapserver-ows` - a self-hosted HTTP OWS service (WMS `GetMap`, WFS
+   `GetFeature`) built on `actix-web`, replacing the legacy CGI/FastCGI
+   entry point (`src/mapserv.c`) — see "OWS services" below.
 
 ## Building and testing
 
@@ -135,3 +138,62 @@ let mut renderer = SkiaRenderer::new(256, 256, None);
 render_layer(&features, &classes, None, None, &view, &mut renderer);
 let png_bytes = renderer.encode_png();
 ```
+
+## OWS services
+
+`mapserver-ows` replaces the legacy CGI/FastCGI entry point
+(`src/mapserv.c`/`src/cgiutil.c`) with a standalone HTTP service built on
+[`actix-web`](https://crates.io/crates/actix-web), rather than porting the
+CGI/FastCGI protocol itself. It exposes a single `GET /ows` endpoint that
+dispatches on the `SERVICE`/`REQUEST` query parameters, the same
+query-string convention used by the C CGI server (e.g.
+`?SERVICE=WMS&REQUEST=GetMap&...`), so existing `QUERY_STRING` fixtures
+(like those under `msautotest/wxs/`) translate directly to HTTP query
+strings against the new service.
+
+- **`mapconfig`** parses a mapfile (via `mapserver-core::mapfile`) into a
+  reduced `MapConfig`/`LayerConfig` model covering just what's needed to
+  answer requests: layer `NAME`/`DATA`/`CLASSITEM`/`CLASS`es. Only
+  FlatGeobuf-backed layers (`DATA` pointing at a `.fgb` file) are
+  supported, since that's the only `LayerDataSource` backend ported so far
+  (issue #9); shapefile/OGR/GDAL sources are not yet available.
+- **`wms`** implements `GetMap`: parses `BBOX`/`WIDTH`/`HEIGHT`/`LAYERS`/
+  `FORMAT` (only `image/png` is supported), queries and classifies each
+  requested layer's features, and renders them via `mapserver-render` to a
+  PNG.
+- **`wfs`** implements `GetFeature`: parses `TYPENAME`/`TYPENAMES`, an
+  optional `BBOX`, and `COUNT`/`MAXFEATURES`, and returns a GeoJSON
+  `FeatureCollection` (rather than the GML MapServer's C implementation
+  returns by default — GeoJSON is simpler to produce correctly without a
+  full GML/XSD schema layer, and is directly consumable by common GIS
+  clients).
+
+Run the server against a mapfile with:
+
+```sh
+cd rust
+cargo run -p mapserver-ows -- /path/to/some.map 127.0.0.1:8080
+curl "http://127.0.0.1:8080/ows?SERVICE=WMS&REQUEST=GetMap&BBOX=-20,-35,55,40&WIDTH=400&HEIGHT=400&LAYERS=africa&FORMAT=image/png" -o map.png
+curl "http://127.0.0.1:8080/ows?SERVICE=WFS&REQUEST=GetFeature&TYPENAME=africa"
+```
+
+### Scope and known gaps
+
+This is a first, functional cut of the OWS layer, not a byte-for-byte
+replacement of the C WMS/WFS implementations (`mapwms.cpp`/`mapwfs.cpp`,
+~6k lines each). Deliberately out of scope for now, left as follow-up work:
+
+- `GetCapabilities`/`DescribeLayer`/`GetFeatureInfo`/`GetLegendGraphic` and
+  other WMS/WFS/WCS request types.
+- `CRS`/`SRS` reprojection (requests are assumed to already be in the
+  layer's native projection), `STYLES`, `TRANSPARENT`, `BGCOLOR`, and
+  exception-handling query parameters.
+- GML output for WFS (GeoJSON is returned instead, see above).
+- Non-FlatGeobuf data sources.
+- `mapfile`-declared WMS/WFS `METADATA` (`wms_title`, `wms_enable_request`,
+  etc.) that drive real OWS capability negotiation.
+
+`mapserver-ows/tests/integration.rs` exercises `GetMap` and `GetFeature`
+end-to-end (mapfile parsing → query → classify → render/serialize) against
+the real `msautotest/misc/data/africa.fgb` fixture used by
+`mapserver-flatgeobuf`'s own tests.
